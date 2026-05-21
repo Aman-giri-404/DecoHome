@@ -5,6 +5,7 @@ import dns from "dns";
 
 
 import UserRoutes from "./routes/UserRoutes.js";
+import ProductRoutes from "./routes/ProductRoutes.js";
 import connectDB from "./confi/db.js";
 
 dotenv.config();
@@ -22,6 +23,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", UserRoutes);
+app.use("/api/product", ProductRoutes);
+
+
+
 
 const PORT = process.env.PORT || 5000;
 
