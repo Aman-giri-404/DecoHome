@@ -12,7 +12,7 @@ export default function Navbar() {
           </h1>
         </div>
 
-        <div className="hidden lg:flex items-center gap-1 hover:border border-white px-2 py-1 cursor-pointer">
+        <div className="lg:flex items-center gap-1 hover:border border-white px-2 py-1 cursor-pointer">
           <MapPin size={18} />
           <div className="leading-tight">
             <p className="text-xs text-gray-300">Delivering to Ahmedabad</p>
@@ -32,17 +32,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        <ul className="flex gap-6 text-lg font-medium">
-          <li className="hover:text-sky-400 cursor-pointer transition">Home</li>
-
-          <li className="hover:text-sky-400 cursor-pointer transition">
-            About
-          </li>
-
-          <li className="hover:text-sky-400 cursor-pointer transition">
-            Contact
-          </li>
-        </ul>
+       
       </div>
     </nav>
   );
