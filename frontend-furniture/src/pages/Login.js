@@ -29,6 +29,7 @@ export default function Login() {
       if (!res.ok) {
         alert(data.message || "Login Failed");
       } else {
+        localStorage.setItem("user", JSON.stringify(data.user));
         toast("Login successfully")
 
        
