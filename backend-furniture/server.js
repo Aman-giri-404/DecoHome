@@ -7,7 +7,8 @@ import dns from "dns";
 import UserRoutes from "./routes/UserRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import connectDB from "./confi/db.js";
-
+import path from "path";
+import { fileURLToPath } from "url";
 dotenv.config();
 const app = express();
 
@@ -23,9 +24,15 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", UserRoutes);
-app.use("/api/product", ProductRoutes);
+app.use("/api/admin", ProductRoutes);
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
 
 const PORT = process.env.PORT || 5000;

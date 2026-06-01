@@ -1,182 +1,233 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  Menu,
-  Search,
-  MapPin,
+  Heart,
+  ShoppingBag,
   User,
-  Package,
+  Search,
+  LogOut,
+  Menu,
   X,
-  Handbag,
 } from "lucide-react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const [search, setSearch] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const [user, setUser] = useState(null);
 
-  const navigate = useNavigate();
-
-
   useEffect(() => {
-    const loggedUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = localStorage.getItem("user");
 
-    if (loggedUser) {
-      setUser(loggedUser);
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 
- 
   const handleLogout = () => {
     localStorage.removeItem("user");
-
     setUser(null);
 
-    navigate("/sign-in");
-  };
-
- 
-  const handleSearch = () => {
-    console.log(search);
-
+    toast.success("Logout successfully");
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full shadow-lg">
-      <div className="bg-[#131921] text-white px-4 py-3 ">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
-    
-          <div className="flex items-center gap-4">
-            {/* MOBILE MENU */}
-            <button className="md:hidden" onClick={() => setMenuOpen(true)}>
+    <>
+      <div className="w-full shadow-sm border-b bg-white sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 md:px-10 py-4">
+          <ToastContainer position="bottom-right" autoClose={2000} />
+
+          <div className="flex items-center gap-6">
+            <button className="lg:hidden" onClick={() => setMobileMenu(true)}>
               <Menu size={28} />
             </button>
 
-          
-            <Link to="/">
-              <h1 className="text-4xl md:text-3xl font-bold tracking-wide cursor-pointer">
-                amazon
-                <span className="text-orange-400 text-sm">.in</span>
-              </h1>
-            </Link>
+            <h1 className="text-4xl font-extrabold text-pink-500 cursor-pointer">
+              M
+            </h1>
 
-       
-            <div className="hidden lg:flex items-center gap-1 hover:border border-white px-2 py-1 cursor-pointer">
-              <MapPin size={18} />
+            <ul className="hidden lg:flex items-center gap-8 text-[14px] font-semibold text-gray-800">
+              <li className="cursor-pointer hover:text-pink-500">TABLE</li>
 
-              <div className="leading-tight">
-                <p className="text-xs text-gray-300">Delivering to Ahmedabad</p>
+              <li className="cursor-pointer hover:text-pink-500">CHAIR</li>
 
-                <p className="text-sm font-bold">Update location</p>
-              </div>
-            </div>
+              <li className="cursor-pointer hover:text-pink-500">BEDS</li>
+
+              <li className="cursor-pointer hover:text-pink-500">
+                OFFICE DESK
+              </li>
+
+              <li className="cursor-pointer hover:text-pink-500">DINNING</li>
+
+              <li className="cursor-pointer hover:text-pink-500 flex items-center gap-1">
+                LATEST MODEL
+                <span className="text-red-500 text-[10px] font-bold">NEW</span>
+              </li>
+            </ul>
           </div>
 
-        
-          <div className="flex flex-1 items-center max-w-3xl">
-            <select className="hidden md:block bg-gray-200 text-black px-3 py-[11px] rounded-l-md outline-none border-r border-gray-400 text-sm">
-              <option>All</option>
-              <option>Electronics</option>
-              <option>Fashion</option>
-              <option>Furniture</option>
-              <option>Mobiles</option>
-            </select>
+          <div className="hidden md:flex items-center bg-gray-100 px-4 py-2 rounded-md w-[35%]">
+            <Search size={18} className="text-gray-500" />
+
+            <input
+              type="text"
+              placeholder="Search for products, brands and more"
+              className="bg-transparent outline-none px-3 w-full text-sm"
+            />
+          </div>
+
+          <div className="flex items-center gap-5 md:gap-8">
+            <div
+              className="relative"
+              onMouseEnter={() => setShowProfile(true)}
+              onMouseLeave={() => setShowProfile(false)}
+            >
+              <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+                <User size={20} />
+
+                <span className="hidden md:block">
+                  {user ? user.name : "Profile"}
+                </span>
+              </div>
+
+              {showProfile && (
+                <div className="absolute right-0 top-12 w-72 bg-white shadow-xl border rounded-sm p-5">
+                  {user ? (
+                    <>
+                      <h2 className="font-bold text-gray-800 text-lg">
+                        Welcome {user.name}
+                      </h2>
+
+                      <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 mt-4 bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 transition"
+                      >
+                        <LogOut size={18} />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="font-bold text-gray-800 text-lg">
+                        Welcome
+                      </h2>
+
+                      <p className="text-sm text-gray-500 mt-1">
+                        To access account and manage orders
+                      </p>
+
+                      <Link to="/sign-in">
+                        <button className="border border-pink-500 text-pink-500 font-bold px-5 py-2 mt-4 hover:bg-pink-50 transition">
+                          LOGIN / SIGNUP
+                        </button>
+                      </Link>
+                    </>
+                  )}
+
+                  <div className="border-t my-4"></div>
+
+                  <div className="flex flex-col gap-2 text-sm text-gray-700">
+                    <p className="hover:text-pink-500 cursor-pointer">Orders</p>
+
+                    <p className="hover:text-pink-500 cursor-pointer">
+                      Wishlist
+                    </p>
+
+                    <p className="hover:text-pink-500 cursor-pointer">
+                      Gift Cards
+                    </p>
+
+                    <p className="hover:text-pink-500 cursor-pointer">
+                      Contact Us
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+              <Heart size={20} />
+
+              <span className="hidden md:block">Wishlist</span>
+            </div>
+
+            <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+              <ShoppingBag size={20} />
+
+              <span className="hidden md:block">Bag</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="md:hidden px-4 pb-4">
+          <div className="flex items-center bg-gray-100 px-4 py-2 rounded-md">
+            <Search size={18} className="text-gray-500" />
 
             <input
               type="text"
               placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-[10px] text-black outline-none"
+              className="bg-transparent outline-none px-3 w-full text-sm"
             />
-
-            <button
-              onClick={handleSearch}
-              className="bg-[#febd69] hover:bg-[#f3a847] px-5 py-[10px] rounded-r-md transition"
-            >
-              <Search className="text-black" size={22} />
-            </button>
-          </div>
-
-       
-          <div className="hidden md:flex items-center gap-4">
-          
-            <div className="hover:border border-white px-2 py-1 rounded cursor-pointer">
-              {user ? (
-                <div>
-                  <p className="text-xs text-gray-300">Hello, {user.name}</p>
-
-                  <button onClick={handleLogout} className="text-sm font-bold">
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <Link to="/sign-in">
-                  <div className="flex items-center gap-2">
-                    <User size={20} />
-
-                    <div>
-                      <p className="text-xs text-gray-300">Hello, sign in</p>
-
-                      <p className="text-sm font-bold">Account & Lists</p>
-                    </div>
-                  </div>
-                </Link>
-              )}
-            </div>
-
-            
-            <div className="hover:border border-white px-2 py-1 rounded cursor-pointer">
-              <div className="flex items-center gap-2">
-                <Package size={20} />
-
-                <div>
-                  <p className="text-xs text-gray-300">Returns</p>
-
-                  <p className="text-sm font-bold">Orders</p>
-                </div>
-              </div>
-            </div>
-
-          
-            <Link to="/">
-              <div className="flex items-center gap-2 hover:border border-white px-2 py-1 rounded cursor-pointer relative">
-               <Handbag color="#ffff" strokeWidth={2} size={32} />
-
-         
-
-                <span className="font-bold mt-2">Cart</span>
-              </div>
-            </Link>
           </div>
         </div>
       </div>
 
-   
+      <div
+        className={`fixed top-0 left-0 h-full w-[280px] bg-white z-[100] shadow-xl transform transition-transform duration-300 ${
+          mobileMenu ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between p-5 border-b">
+          <h1 className="text-3xl font-bold text-pink-500">MENU</h1>
 
-      {menuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 ">
-          <div className="bg-white w-72 h-full p-5">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">Menu</h2>
+          <button onClick={() => setMobileMenu(false)}>
+            <X size={28} />
+          </button>
+        </div>
 
-              <button onClick={() => setMenuOpen(false)}>
-                <X />
+        <div className="flex flex-col p-5 gap-5 text-gray-800 font-medium">
+          <p className="hover:text-pink-500 cursor-pointer">TABLE</p>
+
+          <p className="hover:text-pink-500 cursor-pointer">CHAIR</p>
+
+          <p className="hover:text-pink-500 cursor-pointer">BEDS</p>
+
+          <p className="hover:text-pink-500 cursor-pointer">OFFICE DESK</p>
+
+          <p className="hover:text-pink-500 cursor-pointer">DINNING</p>
+
+          <p className="hover:text-pink-500 cursor-pointer">LATEST MODEL</p>
+
+          <div className="border-t pt-5">
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-5 py-2 rounded w-full"
+              >
+                Logout
               </button>
-            </div>
-
-            <div className="flex flex-col gap-5 text-lg">
-              <Link to="/">Home</Link>
-              <Link to="/sign-in">Login</Link>
-              <Link to="/sign-up">Register</Link>
-            </div>
+            ) : (
+              <Link to="/sign-in">
+                <button className="border border-pink-500 text-pink-500 px-5 py-2 rounded w-full">
+                  LOGIN / SIGNUP
+                </button>
+              </Link>
+            )}
           </div>
         </div>
+      </div>
+
+      {mobileMenu && (
+        <div
+          onClick={() => setMobileMenu(false)}
+          className="fixed inset-0 bg-black/40 z-50"
+        ></div>
       )}
-    </header>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import Adminpanel from "./pages/Adminpanel";
 import Dashboard from "./pages/Dashboard";
 
 
+
 function App() {
   return (
     <div className="App">
@@ -18,6 +19,7 @@ function App() {
             <Route path="/sign-up" element={<Register />} />
             <Route path="/sign-in" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            
             
           </Routes>
         </BrowserRouter>

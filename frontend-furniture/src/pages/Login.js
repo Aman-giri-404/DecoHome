@@ -1,27 +1,24 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
- 
 
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
       console.log("after log in my data is", data);
@@ -30,10 +27,11 @@ export default function Login() {
         alert(data.message || "Login Failed");
       } else {
         localStorage.setItem("user", JSON.stringify(data.user));
-        toast("Login successfully")
+        toast("Login successfully");
 
-       
-
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -43,13 +41,10 @@ export default function Login() {
     <div className="flex justify-center mt-32">
       <div className="border-2 p-10 rounded-lg w-96 shadow-lg">
         <ToastContainer position="bottom-right" autoClose={2000} />
-        <div className="max-w-4xl mx-auto">
-      
-      </div>
+        <div className="max-w-4xl mx-auto"></div>
         <form onSubmit={handleSubmit}>
           <h1 className="text-3xl font-bold text-center mb-8">Login</h1>
 
-       
           <div className="mb-6">
             <label className="block mb-2 text-sm font-semibold">
               Email Id:
@@ -64,7 +59,6 @@ export default function Login() {
             />
           </div>
 
-       
           <div className="mb-6">
             <label className="block mb-2 text-sm font-semibold">
               Password:

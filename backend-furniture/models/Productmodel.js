@@ -26,10 +26,20 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    stock: {
+  type: Number,
+  default: 0
+},
+
+sold: {
+  type: Number,
+  default: 0
+}
   },
   {
     timestamps: true,
   },
 );
 
-export default mongoose.model("Product", productSchema);
+export default mongoose.model("Productmodel", productSchema);
