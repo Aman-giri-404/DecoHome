@@ -34,6 +34,9 @@ export default function Navbar() {
     toast.success("Logout successfully");
   };
 
+  const order = JSON.parse(localStorage.getItem("order")) || [];
+  const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
   return (
     <>
       <div className="w-full shadow-sm border-b bg-white sticky top-0 z-50">
@@ -132,34 +135,49 @@ export default function Navbar() {
                   <div className="border-t my-4"></div>
 
                   <div className="flex flex-col gap-2 text-sm text-gray-700">
-                    <p className="hover:text-pink-500 cursor-pointer">Orders</p>
+                    <div className="relative">
+                      <Link to="/order">
+                      <button className="hover:text-pink-500 cursor-pointer">
+                        Order
+                      </button>
+                      <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                        {order.length}
+                      </span>
+                      </Link>
+                    </div>
 
-                    <p className="hover:text-pink-500 cursor-pointer">
-                      Wishlist
-                    </p>
-
-                    <p className="hover:text-pink-500 cursor-pointer">
-                      Gift Cards
-                    </p>
-
-                    <p className="hover:text-pink-500 cursor-pointer">
+                    <div className="relative">
+                      <Link to="/wishlist">
+                        <button className="hover:text-pink-500 cursor-pointer">
+                          Wishlist
+                        </button>
+                      <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                        {wishlist.length}
+                      </span>
+                      </Link>
+                    </div>
+                  <Link to="/contact">
+                    <button className="hover:text-pink-500 cursor-pointer">
                       Contact Us
-                    </p>
+                    </button>
+                    </Link>
                   </div>
                 </div>
               )}
             </div>
 
             <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+              <Link to="/wishlist">
               <Heart size={20} />
-
-              <span className="hidden md:block">Wishlist</span>
+              <button className="hidden md:block">Wishlist</button>
+              </Link>
             </div>
 
             <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+              <Link to="/bag">
               <ShoppingBag size={20} />
-
-              <span className="hidden md:block">Bag</span>
+              <button className="hidden md:block">Bag</button>
+              </Link>
             </div>
           </div>
         </div>

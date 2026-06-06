@@ -5,8 +5,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Adminpanel from "./pages/Adminpanel";
 import Dashboard from "./pages/Dashboard";
-
-
+import View from "./components/View";
+import Wishlist from "./components/Wishlist";
+import Bag from "./components/Bag";
 
 function App() {
   return (
@@ -14,13 +15,15 @@ function App() {
       <header className="App-header">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />}/>
+            <Route path="/" element={<Home />} />
             <Route path="/admin-panel" element={<Adminpanel />} />
             <Route path="/sign-up" element={<Register />} />
             <Route path="/sign-in" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            
-            
+            <Route path="/view/:id" element={<View />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/bag" element={<Bag />} />
+
           </Routes>
         </BrowserRouter>
       </header>
