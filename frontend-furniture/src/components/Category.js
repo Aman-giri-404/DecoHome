@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-export default function Home() {
+export default function Category() {
+  const { category } = useParams();
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
@@ -11,32 +12,40 @@ export default function Home() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const fetchCategoryProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError("");
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL}/admin`
+        );
 
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin`
-      );
+        if (!res.ok) {
+          throw new Error("Failed to fetch products");
+        }
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch products");
+        const data = await res.json();
+
+        const filtered = (data.products || []).filter(
+          (item) =>
+            item.category?.toLowerCase() ===
+            category?.toLowerCase()
+        );
+
+        setProducts(filtered);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to load products");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data = await res.json();
-
-      setProducts(data.products || []);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to load products");
-    } finally {
-      setLoading(false);
+    if (category) {
+      fetchCategoryProducts();
     }
-  };
+  }, [category]);
 
   return (
     <>
@@ -47,11 +56,11 @@ export default function Home() {
         {/* Heading */}
         <div className="mb-10">
           <h1 className="text-4xl md:text-5xl font-bold">
-            Latest Products
+            {category}
           </h1>
 
           <p className="text-gray-500 mt-2">
-            Discover our newest collection
+            Browse all {category} products
           </p>
         </div>
 
@@ -69,7 +78,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Empty */}
+        {/* No Products */}
         {!loading &&
           !error &&
           products.length === 0 && (
@@ -79,7 +88,7 @@ export default function Home() {
               </h2>
 
               <p className="text-gray-500 mt-2">
-                Products will appear here once added.
+                No products available in this category.
               </p>
             </div>
           )}
@@ -97,7 +106,7 @@ export default function Home() {
                   }
                   className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group"
                 >
-                  {/* Image */}
+                  {/* Product Image */}
                   <div className="overflow-hidden">
                     <img
                       src={`${process.env.REACT_APP_IMG_URL}${item.image}`}
@@ -110,7 +119,7 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* Content */}
+                  {/* Product Content */}
                   <div className="p-5">
                     <p className="text-sm text-gray-500 uppercase">
                       {item.category}
@@ -136,7 +145,7 @@ export default function Home() {
                         }}
                        
                       >
-                       
+                        
                       </button>
                     </div>
                   </div>

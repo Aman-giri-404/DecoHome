@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import View from "./components/View";
 import Wishlist from "./components/Wishlist";
 import Bag from "./components/Bag";
+import Category from "./components/Category";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
             <Route path="/view/:id" element={<View />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/bag" element={<Bag />} />
-
+            <Route path="/category/:category" element={<Category />} />
           </Routes>
         </BrowserRouter>
       </header>

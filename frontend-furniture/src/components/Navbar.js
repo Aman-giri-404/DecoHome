@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function Navbar() {
@@ -33,9 +33,13 @@ export default function Navbar() {
 
     toast.success("Logout successfully");
   };
+  const navigate = useNavigate();
+
+  const categories = ["TABLE", "CHAIR", "BEDS", "OFFICE DESK", "DINNING"];
 
   const order = JSON.parse(localStorage.getItem("order")) || [];
   const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   return (
     <>
@@ -53,19 +57,22 @@ export default function Navbar() {
             </h1>
 
             <ul className="hidden lg:flex items-center gap-8 text-[14px] font-semibold text-gray-800">
-              <li className="cursor-pointer hover:text-pink-500">TABLE</li>
+              {categories.map((cat) => (
+                <li
+                  key={cat}
+                  onClick={() =>
+                    navigate(`/category/${encodeURIComponent(cat)}`)
+                  }
+                  className="cursor-pointer hover:text-pink-500 transition"
+                >
+                  {cat}
+                </li>
+              ))}
 
-              <li className="cursor-pointer hover:text-pink-500">CHAIR</li>
-
-              <li className="cursor-pointer hover:text-pink-500">BEDS</li>
-
-              <li className="cursor-pointer hover:text-pink-500">
-                OFFICE DESK
-              </li>
-
-              <li className="cursor-pointer hover:text-pink-500">DINNING</li>
-
-              <li className="cursor-pointer hover:text-pink-500 flex items-center gap-1">
+              <li
+                onClick={() => navigate("/")}
+                className="cursor-pointer hover:text-pink-500 flex items-center gap-1"
+              >
                 LATEST MODEL
                 <span className="text-red-500 text-[10px] font-bold">NEW</span>
               </li>
@@ -137,12 +144,12 @@ export default function Navbar() {
                   <div className="flex flex-col gap-2 text-sm text-gray-700">
                     <div className="relative">
                       <Link to="/order">
-                      <button className="hover:text-pink-500 cursor-pointer">
-                        Order
-                      </button>
-                      <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
-                        {order.length}
-                      </span>
+                        <button className="hover:text-pink-500 cursor-pointer">
+                          Order
+                        </button>
+                        <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                          {order.length}
+                        </span>
                       </Link>
                     </div>
 
@@ -151,32 +158,46 @@ export default function Navbar() {
                         <button className="hover:text-pink-500 cursor-pointer">
                           Wishlist
                         </button>
-                      <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
-                        {wishlist.length}
-                      </span>
+                        <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                          {wishlist.length}
+                        </span>
                       </Link>
                     </div>
-                  <Link to="/contact">
-                    <button className="hover:text-pink-500 cursor-pointer">
-                      Contact Us
-                    </button>
+                    <Link to="/contact">
+                      <button className="hover:text-pink-500 cursor-pointer">
+                        Contact Us
+                      </button>
                     </Link>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+            <div className="flex flex-col items-center cursor-pointer text-sm font-medium relative">
               <Link to="/wishlist">
-              <Heart size={20} />
-              <button className="hidden md:block">Wishlist</button>
+                <Heart size={20} />
+
+                <button className="hidden md:block">Wishlist</button>
+
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                    {wishlist.length}
+                  </span>
+                )}
               </Link>
             </div>
 
-            <div className="flex flex-col items-center cursor-pointer text-sm font-medium">
+            <div className="flex flex-col items-center cursor-pointer text-sm font-medium relative">
               <Link to="/bag">
-              <ShoppingBag size={20} />
-              <button className="hidden md:block">Bag</button>
+                <ShoppingBag size={20} />
+
+                <button className="hidden md:block">Bag</button>
+
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                    {cart.length}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
@@ -209,17 +230,19 @@ export default function Navbar() {
         </div>
 
         <div className="flex flex-col p-5 gap-5 text-gray-800 font-medium">
-          <p className="hover:text-pink-500 cursor-pointer">TABLE</p>
+          {categories.map((cat) => (
+            <p
+              key={cat}
+              onClick={() => {
+                navigate(`/category/${encodeURIComponent(cat)}`);
 
-          <p className="hover:text-pink-500 cursor-pointer">CHAIR</p>
-
-          <p className="hover:text-pink-500 cursor-pointer">BEDS</p>
-
-          <p className="hover:text-pink-500 cursor-pointer">OFFICE DESK</p>
-
-          <p className="hover:text-pink-500 cursor-pointer">DINNING</p>
-
-          <p className="hover:text-pink-500 cursor-pointer">LATEST MODEL</p>
+                setMobileMenu(false);
+              }}
+              className="hover:text-pink-500 cursor-pointer"
+            >
+              {cat}
+            </p>
+          ))}
 
           <div className="border-t pt-5">
             {user ? (
