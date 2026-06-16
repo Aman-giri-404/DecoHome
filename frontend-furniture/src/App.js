@@ -9,6 +9,7 @@ import View from "./components/View";
 import Wishlist from "./components/Wishlist";
 import Bag from "./components/Bag";
 import Category from "./components/Category";
+import Order from "./components/Order";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/bag" element={<Bag />} />
             <Route path="/category/:category" element={<Category />} />
+            <Route path="/order" element={<Order />} />
           </Routes>
         </BrowserRouter>
       </header>

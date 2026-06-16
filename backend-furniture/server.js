@@ -6,7 +6,7 @@ import dns from "dns";
 
 import UserRoutes from "./routes/UserRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
-import connectDB from "./confi/db.js";
+import connectDB from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
