@@ -6,6 +6,7 @@ const wishlistSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserModel",
       required: true,
+      unique: true,
     },
 
     products: [
@@ -20,4 +21,7 @@ const wishlistSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("WishlistModel", wishlistSchema);
+export default mongoose.model(
+  "WishlistModel",
+  wishlistSchema
+);

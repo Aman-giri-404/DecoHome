@@ -1,5 +1,29 @@
 import mongoose from "mongoose";
 
+const orderItemSchema = new mongoose.Schema(
+  {
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Productmodel",
+      required: true,
+    },
+
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    price: {
+      type: Number,
+      required: true,
+    },
+  },
+  {
+    _id: false,
+  }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     user: {
@@ -8,50 +32,22 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-    products: [
-      {
-        product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Productmodel",
-          required: true,
-        },
-
-        quantity: {
-          type: Number,
-          required: true,
-          default: 1,
-        },
-
-        price: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
+    items: [orderItemSchema],
 
     totalAmount: {
       type: Number,
       required: true,
     },
 
-    shippingAddress: {
-      fullName: String,
-      phone: String,
-      address: String,
-      city: String,
-      state: String,
-      pincode: String,
-    },
-
     paymentMethod: {
       type: String,
-      enum: ["COD", "Online"],
+      enum: ["COD", "ONLINE"],
       default: "COD",
     },
 
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Paid", "Failed"],
+      enum: ["Pending", "Paid", "Failed", "Refunded"],
       default: "Pending",
     },
 
@@ -66,6 +62,11 @@ const orderSchema = new mongoose.Schema(
         "Cancelled",
       ],
       default: "Pending",
+    },
+
+    address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AddressModel",
     },
   },
   {

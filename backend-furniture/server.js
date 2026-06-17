@@ -9,6 +9,16 @@ import ProductRoutes from "./routes/ProductRoutes.js";
 import connectDB from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import CartRoutes from "./routes/CartRoutes.js";
+import OrderRoutes from "./routes/OrderRoutes.js";
+import AddressRoutes from "./routes/AddressRoutes.js";
+import WishlistRoutes from "./routes/WishlistRoutes.js";
+import ReviewRoutes from "./routes/ReviewRoutes.js";
+import CategoryRoutes from "./routes/CategoryRoutes.js";
+import CouponRoutes from "./routes/CouponRoutes.js";
+
+
+
 dotenv.config();
 const app = express();
 
@@ -25,6 +35,15 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", UserRoutes);
 app.use("/api/admin", ProductRoutes);
+app.use("/api/cart", CartRoutes);
+app.use("/api/orders", OrderRoutes);
+app.use("/api/address", AddressRoutes);
+app.use("/api/wishlist", WishlistRoutes);
+app.use("/api/reviews", ReviewRoutes);
+app.use("/api/categories", CategoryRoutes);
+app.use("/api/coupons", CouponRoutes);
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

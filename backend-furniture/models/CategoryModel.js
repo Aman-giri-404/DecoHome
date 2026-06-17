@@ -6,11 +6,22 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
 
     image: {
       type: String,
       default: "",
+    },
+
+    description: {
+      type: String,
+      default: "",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -18,4 +29,7 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("CategoryModel", categorySchema);
+export default mongoose.model(
+  "CategoryModel",
+  categorySchema
+);

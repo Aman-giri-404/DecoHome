@@ -8,24 +8,57 @@ const addressSchema = new mongoose.Schema(
       required: true,
     },
 
-    fullName: String,
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    phone: String,
+    mobile: {
+      type: String,
+      required: true,
+    },
 
-    address: String,
+    addressLine1: {
+      type: String,
+      required: true,
+    },
 
-    landmark: String,
+    addressLine2: {
+      type: String,
+      default: "",
+    },
 
-    city: String,
+    landmark: {
+      type: String,
+      default: "",
+    },
 
-    state: String,
+    city: {
+      type: String,
+      required: true,
+    },
+
+    state: {
+      type: String,
+      required: true,
+    },
 
     country: {
       type: String,
       default: "India",
     },
 
-    pincode: String,
+    pincode: {
+      type: String,
+      required: true,
+    },
+
+    addressType: {
+      type: String,
+      enum: ["Home", "Office", "Other"],
+      default: "Home",
+    },
 
     isDefault: {
       type: Boolean,
@@ -37,4 +70,7 @@ const addressSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("AddressModel", addressSchema);
+export default mongoose.model(
+  "AddressModel",
+  addressSchema
+);

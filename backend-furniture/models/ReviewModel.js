@@ -16,14 +16,15 @@ const reviewSchema = new mongoose.Schema(
 
     rating: {
       type: Number,
+      required: true,
       min: 1,
       max: 5,
-      required: true,
     },
 
     comment: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
   },
   {
@@ -31,4 +32,13 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("ReviewModel", reviewSchema);
+// Prevent duplicate reviews by the same user for the same product
+reviewSchema.index(
+  { user: 1, product: 1 },
+  { unique: true }
+);
+
+export default mongoose.model(
+  "ReviewModel",
+  reviewSchema
+);
