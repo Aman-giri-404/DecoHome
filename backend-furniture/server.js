@@ -16,8 +16,8 @@ import WishlistRoutes from "./routes/WishlistRoutes.js";
 import ReviewRoutes from "./routes/ReviewRoutes.js";
 import CategoryRoutes from "./routes/CategoryRoutes.js";
 import CouponRoutes from "./routes/CouponRoutes.js";
-
-
+import ContactRoutes from "./routes/ContactRoutes.js";
+import DashboardRoutes from "./routes/DashboardRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -42,8 +42,8 @@ app.use("/api/wishlist", WishlistRoutes);
 app.use("/api/reviews", ReviewRoutes);
 app.use("/api/categories", CategoryRoutes);
 app.use("/api/coupons", CouponRoutes);
-
-
+app.use("/api/contact", ContactRoutes);
+app.use("/api/dashboard", DashboardRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
