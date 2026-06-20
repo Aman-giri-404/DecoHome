@@ -134,7 +134,7 @@ export default function View() {
           <div className="flex flex-col gap-5">
 
             <p className="text-sm text-gray-400 uppercase tracking-widest font-medium">
-              {product.category}
+              {product.category && typeof product.category === "object" ? product.category.name : product.category}
             </p>
 
             <h1 className="text-3xl font-bold text-gray-900 leading-snug">
@@ -254,7 +254,7 @@ export default function View() {
             <tbody>
               {[
                 { label: "Product", value: product.title },
-                { label: "Category", value: product.category },
+                { label: "Category", value: product.category && typeof product.category === "object" ? product.category.name : product.category },
                 { label: "Price", value: `₹${product.price.toLocaleString()}` },
                 { label: "Description", value: product.description },
               ].map(({ label, value }) => (

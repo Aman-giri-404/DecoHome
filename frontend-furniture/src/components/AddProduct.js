@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function AddProduct() {
+export default function AddProduct({ onSuccess }) {
   const [form, setForm] = useState({
     title: "",
     price: "",
@@ -69,7 +69,7 @@ export default function AddProduct() {
 
       // Create Product
       const productRes = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/product`,
+        `${process.env.REACT_APP_API_URL}/admin`,
         {
           method: "POST",
           headers: {
@@ -91,6 +91,10 @@ export default function AddProduct() {
       }
 
       toast.success("Product Added Successfully");
+
+      if (onSuccess) {
+        onSuccess();
+      }
 
       // Reset Form
       setForm({

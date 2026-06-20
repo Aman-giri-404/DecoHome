@@ -10,6 +10,7 @@ import Wishlist from "./components/Wishlist";
 import Bag from "./components/Bag";
 import Category from "./components/Category";
 import Order from "./components/Order";
+import Contact from "./components/Contact";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/bag" element={<Bag />} />
             <Route path="/category/:category" element={<Category />} />
             <Route path="/order" element={<Order />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </BrowserRouter>
       </header>

@@ -113,7 +113,7 @@ export default function Home() {
                   {/* Content */}
                   <div className="p-5">
                     <p className="text-sm text-gray-500 uppercase">
-                      {item.category}
+                      {item.category && typeof item.category === "object" ? item.category.name : item.category}
                     </p>
 
                     <h2 className="font-bold text-xl mt-2 line-clamp-1">

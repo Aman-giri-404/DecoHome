@@ -18,12 +18,22 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const [user, setUser] = useState(null);
+  const [ordersCount, setOrdersCount] = useState(0);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      
+      // Fetch orders count from backend
+      fetch(`${process.env.REACT_APP_API_URL}/orders/user/${parsedUser._id}`)
+        .then(res => res.json())
+        .then(data => {
+          setOrdersCount(data.count || 0);
+        })
+        .catch(err => console.log("Error loading orders count in Navbar:", err));
     }
   }, []);
 
@@ -37,7 +47,6 @@ export default function Navbar() {
 
   const categories = ["TABLE", "CHAIR", "BEDS", "OFFICE DESK", "DINNING"];
 
-  const order = JSON.parse(localStorage.getItem("order")) || [];
   const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -147,9 +156,11 @@ export default function Navbar() {
                         <button className="hover:text-pink-500 cursor-pointer">
                           Order
                         </button>
-                        <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
-                          {order.length}
-                        </span>
+                        {ordersCount > 0 && (
+                          <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-1 rounded-full">
+                            {ordersCount}
+                          </span>
+                        )}
                       </Link>
                     </div>
 

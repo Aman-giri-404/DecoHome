@@ -210,7 +210,7 @@ useEffect(() => {
                   </h2>
 
                   <p className="text-gray-500 text-sm mt-1">
-                    {item.category}
+                    {item.category && typeof item.category === "object" ? item.category.name : item.category}
                   </p>
 
                   <p className="text-pink-600 font-bold text-xl mt-3">

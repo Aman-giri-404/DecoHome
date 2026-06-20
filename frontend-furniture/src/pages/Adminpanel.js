@@ -25,9 +25,10 @@ export default function Adminpanel() {
         alert(data.message || "Login Failed");
       } else {
         localStorage.setItem("admin", JSON.stringify(data.user));
-        toast("Admin Login Successful");
-        console.log(data);
-        
+        toast.success("Admin Login Successful");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
       }
     } catch (error) {
       console.error("Error:", error);

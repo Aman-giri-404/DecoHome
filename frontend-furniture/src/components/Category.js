@@ -27,11 +27,10 @@ export default function Category() {
 
         const data = await res.json();
 
-        const filtered = (data.products || []).filter(
-          (item) =>
-            item.category?.toLowerCase() ===
-            category?.toLowerCase()
-        );
+        const filtered = (data.products || []).filter((item) => {
+          const itemCat = item.category && typeof item.category === "object" ? item.category.name : item.category;
+          return itemCat?.toLowerCase() === category?.toLowerCase();
+        });
 
         setProducts(filtered);
       } catch (error) {
@@ -122,7 +121,7 @@ export default function Category() {
                   {/* Product Content */}
                   <div className="p-5">
                     <p className="text-sm text-gray-500 uppercase">
-                      {item.category}
+                      {item.category && typeof item.category === "object" ? item.category.name : item.category}
                     </p>
 
                     <h2 className="font-bold text-xl mt-2 line-clamp-1">
