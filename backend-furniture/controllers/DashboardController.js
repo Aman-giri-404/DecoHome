@@ -1,8 +1,8 @@
-import ProductModel from "../models/Productmodel.js";
+import ProductModel from "../models/ProductModel.js";
 import UserModel from "../models/UserModel.js";
 import OrderModel from "../models/OrderModel.js";
 import ContactModel from "../models/ContactModel.js";
-import PaymentModel from "../models/PaymentModel.js";
+
 
 export const getDashboard = async (req, res) => {
   try {
@@ -81,8 +81,8 @@ export const getDashboard = async (req, res) => {
     // Successful Payments
 
     const successfulPayments =
-      await PaymentModel.countDocuments({
-        status: "Success",
+      await OrderModel.countDocuments({
+        paymentStatus: "Paid",
       });
 
     res.status(200).json({

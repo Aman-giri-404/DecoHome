@@ -4,27 +4,57 @@ import upload from "../middleware/upload.js";
 import {
   createProduct,
   getProducts,
+  getFeaturedProducts,
+  getLatestProducts,
+  getTopSellingProducts,
+  getLowStockProducts,
   getSingleProduct,
+  updateProduct,
   deleteProduct,
   uploadImage,
   updateImage,
   getImages,
 } from "../controllers/ProductController.js";
 
-const Prouter = express.Router();
+const router = express.Router();
 
-Prouter.post("/product", createProduct);
+router.post("/", createProduct);
 
-Prouter.get("/", getProducts);
+router.get("/", getProducts);
 
-Prouter.get("/images", getImages);
+router.get("/featured", getFeaturedProducts);
 
-Prouter.post("/upload", upload.single("image"), uploadImage);
+router.get("/latest", getLatestProducts);
 
-Prouter.put("/upload/:id", upload.single("image"), updateImage);
+router.get(
+  "/top-selling",
+  getTopSellingProducts
+);
 
-Prouter.get("/:id", getSingleProduct);
+router.get(
+  "/low-stock",
+  getLowStockProducts
+);
 
-Prouter.delete("/:id", deleteProduct);
+router.get("/images", getImages);
 
-export default Prouter;
+router.post(
+  "/upload",
+  upload.single("image"),
+  uploadImage
+);
+
+router.put(
+  "/upload/:id",
+  upload.single("image"),
+  updateImage
+);
+
+router.get("/:id", getSingleProduct);
+
+router.put("/:id", updateProduct);
+
+router.delete("/:id", deleteProduct);
+
+
+export default router;

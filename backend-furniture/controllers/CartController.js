@@ -1,5 +1,5 @@
 import CartModel from "../models/CartModel.js";
-import ProductModel from "../models/Productmodel.js";
+import ProductModel from "../models/ProductModel.js";
 
 //
 // Add Product To Cart

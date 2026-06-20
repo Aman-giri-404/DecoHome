@@ -1,5 +1,5 @@
 import WishlistModel from "../models/WishlistModel.js";
-import ProductModel from "../models/Productmodel.js";
+import ProductModel from "../models/ProductModel.js";
 
 //
 // Add Product

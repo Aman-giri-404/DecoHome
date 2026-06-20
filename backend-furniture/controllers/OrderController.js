@@ -1,60 +1,61 @@
-import CartModel from "../models/CartModel.js";
 import OrderModel from "../models/OrderModel.js";
-import ProductModel from "../models/Productmodel.js";
+import ProductModel from "../models/ProductModel.js";
 
+//
+// CREATE ORDER
+//
 export const createOrder = async (req, res) => {
   try {
-    const { userId, addressId, paymentMethod } = req.body;
+    const {
+      user,
+      items,
+      totalAmount,
+      paymentMethod,
+      paymentStatus,
+      address,
+    } = req.body;
 
-    const cart = await CartModel.findOne({
-      user: userId,
-    }).populate("items.product");
-
-    if (!cart || cart.items.length === 0) {
+    if (!items || items.length === 0) {
       return res.status(400).json({
-        message: "Cart is empty",
+        message: "Order items cannot be empty.",
       });
     }
 
-    let total = 0;
+    // Update stock and sold count
+    for (const item of items) {
+      const product = await ProductModel.findById(
+        item.product
+      );
 
-    const orderItems = [];
+      if (!product) {
+        return res.status(404).json({
+          message: `Product not found: ${item.product}`,
+        });
+      }
 
-    for (const item of cart.items) {
-      total += item.product.price * item.quantity;
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          message: `${product.title} is out of stock.`,
+        });
+      }
 
-      orderItems.push({
-        product: item.product._id,
-        quantity: item.quantity,
-        price: item.product.price,
-      });
+      product.stock -= item.quantity;
+      product.sold += item.quantity;
 
-      item.product.stock -= item.quantity;
-
-      item.product.sold += item.quantity;
-
-      await item.product.save();
+      await product.save();
     }
 
     const order = await OrderModel.create({
-      user: userId,
-
-      items: orderItems,
-
-      totalAmount: total,
-
+      user,
+      items,
+      totalAmount,
       paymentMethod,
-
-      address: addressId,
+      paymentStatus,
+      address,
     });
 
-    cart.items = [];
-
-    await cart.save();
-
     res.status(201).json({
-      message: "Order placed successfully",
-
+      message: "Order placed successfully.",
       order,
     });
   } catch (error) {
@@ -65,22 +66,24 @@ export const createOrder = async (req, res) => {
 };
 
 
-export const getUserOrders = async (req, res) => {
+//
+// GET ALL ORDERS
+//
+export const getOrders = async (req, res) => {
   try {
-    const { userId } = req.params;
-
-    const orders = await OrderModel.find({
-      user: userId,
-    })
-      .populate("items.product")
+    const orders = await OrderModel.find()
+      .populate("user", "name email")
       .populate("address")
+      .populate(
+        "items.product",
+        "title image price"
+      )
       .sort({
         createdAt: -1,
       });
 
     res.status(200).json({
       count: orders.length,
-
       orders,
     });
   } catch (error) {
@@ -91,20 +94,33 @@ export const getUserOrders = async (req, res) => {
 };
 
 
-export const getSingleOrder = async (req, res) => {
+//
+// GET SINGLE ORDER
+//
+export const getSingleOrder = async (
+  req,
+  res
+) => {
   try {
-    const order = await OrderModel.findById(req.params.id)
-      .populate("items.product")
+    const order = await OrderModel.findById(
+      req.params.id
+    )
+      .populate("user", "name email")
       .populate("address")
-      .populate("user");
+      .populate(
+        "items.product",
+        "title image price"
+      );
 
     if (!order) {
       return res.status(404).json({
-        message: "Order not found",
+        message: "Order not found.",
       });
     }
 
-    res.status(200).json(order);
+    res.status(200).json({
+      order,
+    });
   } catch (error) {
     res.status(500).json({
       error: error.message,
@@ -113,25 +129,82 @@ export const getSingleOrder = async (req, res) => {
 };
 
 
-export const updateOrderStatus = async (req, res) => {
+//
+// GET USER ORDERS
+//
+export const getUserOrders = async (req, res) => {
   try {
-    const { status } = req.body;
-
-    const order = await OrderModel.findByIdAndUpdate(
-      req.params.id,
-
-      {
-        orderStatus: status,
-      },
-
-      {
-        new: true,
-      }
-    );
+    const orders = await OrderModel.find({
+      user: req.params.userId,
+    })
+      .populate(
+        "items.product",
+        "title image price"
+      )
+      .populate("address")
+      .sort({
+        createdAt: -1,
+      });
 
     res.status(200).json({
-      message: "Status updated",
+      count: orders.length,
+      orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
 
+
+//
+// UPDATE ORDER STATUS
+//
+export const updateOrderStatus = async (
+  req,
+  res
+) => {
+  try {
+    const { orderStatus } = req.body;
+
+    const allowedStatuses = [
+      "Pending",
+      "Confirmed",
+      "Packed",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
+
+    if (
+      !allowedStatuses.includes(orderStatus)
+    ) {
+      return res.status(400).json({
+        message: "Invalid order status.",
+      });
+    }
+
+    const order =
+      await OrderModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          orderStatus,
+        },
+        {
+          new: true,
+        }
+      );
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found.",
+      });
+    }
+
+    res.status(200).json({
+      message:
+        "Order status updated successfully.",
       order,
     });
   } catch (error) {

@@ -1,4 +1,4 @@
-import ProductModel from "../models/Productmodel.js";
+import ProductModel from "../models/ProductModel.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,18 +11,52 @@ const __dirname = path.dirname(__filename);
 //
 export const createProduct = async (req, res) => {
   try {
-    const { title, price, category, image, description } = req.body;
+    const {
+      title,
+      slug,
+      description,
+      price,
+      originalPrice,
+      category,
+      brand,
+      image,
+      images,
+      stock,
+      sku,
+      tags,
+      isFeatured,
+      isActive,
+    } = req.body;
+
+    const existingSlug = await ProductModel.findOne({
+      slug,
+    });
+
+    if (existingSlug) {
+      return res.status(400).json({
+        message: "Slug already exists.",
+      });
+    }
 
     const product = await ProductModel.create({
       title,
-      price,
-      category,
-      image,
+      slug,
       description,
+      price,
+      originalPrice,
+      category,
+      brand,
+      image,
+      images,
+      stock,
+      sku,
+      tags,
+      isFeatured,
+      isActive,
     });
 
     res.status(201).json({
-      message: "Product created successfully",
+      message: "Product created successfully.",
       product,
     });
   } catch (error) {
@@ -33,25 +67,80 @@ export const createProduct = async (req, res) => {
 };
 
 //
-// GET ALL PRODUCTS
+// GET PRODUCTS
 //
 export const getProducts = async (req, res) => {
   try {
-    const categoryParam = req.query.category;
+    const {
+      category,
+      brand,
+      featured,
+      active,
+      search,
+      minPrice,
+      maxPrice,
+      page = 1,
+      limit = 10,
+      sort = "-createdAt",
+    } = req.query;
 
-    let products;
+    let filter = {};
 
-    if (categoryParam) {
-      products = await ProductModel.find({
-        category: categoryParam,
-      });
-    } else {
-      products = await ProductModel.find();
+    if (category) {
+      filter.category = category;
     }
 
+    if (brand) {
+      filter.brand = brand;
+    }
+
+    if (featured) {
+      filter.isFeatured = featured === "true";
+    }
+
+    if (active) {
+      filter.isActive = active === "true";
+    }
+
+    if (search) {
+      filter.title = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+
+      if (minPrice) {
+        filter.price.$gte = Number(minPrice);
+      }
+
+      if (maxPrice) {
+        filter.price.$lte = Number(maxPrice);
+      }
+    }
+
+    const skip = (page - 1) * limit;
+
+    const products = await ProductModel.find(filter)
+      .populate("category")
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalProducts =
+      await ProductModel.countDocuments(filter);
+
     res.status(200).json({
-      message: "Products fetched successfully",
-      count: products.length,
+      currentPage: Number(page),
+
+      totalPages: Math.ceil(
+        totalProducts / limit
+      ),
+
+      totalProducts,
+
       products,
     });
   } catch (error) {
@@ -66,16 +155,17 @@ export const getProducts = async (req, res) => {
 //
 export const getSingleProduct = async (req, res) => {
   try {
-    const product = await ProductModel.findById(req.params.id);
+    const product = await ProductModel.findById(
+      req.params.id
+    ).populate("category");
 
     if (!product) {
       return res.status(404).json({
-        message: "Product not found",
+        message: "Product not found.",
       });
     }
 
     res.status(200).json({
-      message: "Product fetched successfully",
       product,
     });
   } catch (error) {
@@ -86,18 +176,54 @@ export const getSingleProduct = async (req, res) => {
 };
 
 //
-// DELETE PRODUCT + IMAGE
+// UPDATE PRODUCT
 //
-export const deleteProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
-    const product = await ProductModel.findById(req.params.id);
+    const product =
+      await ProductModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
     if (!product) {
       return res.status(404).json({
-        message: "Product not found",
+        message: "Product not found.",
       });
     }
 
+    res.status(200).json({
+      message: "Product updated successfully.",
+
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+//
+// DELETE PRODUCT
+//
+export const deleteProduct = async (req, res) => {
+  try {
+    const product = await ProductModel.findById(
+      req.params.id
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    // Delete main image
     if (product.image) {
       const fileName = product.image.split("/").pop();
 
@@ -112,10 +238,32 @@ export const deleteProduct = async (req, res) => {
       }
     }
 
-    await ProductModel.findByIdAndDelete(req.params.id);
+    // Delete gallery images
+    if (
+      product.images &&
+      Array.isArray(product.images)
+    ) {
+      for (const img of product.images) {
+        const fileName = img.split("/").pop();
+
+        const filePath = path.join(
+          __dirname,
+          "../uploads",
+          fileName
+        );
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+    }
+
+    await ProductModel.findByIdAndDelete(
+      req.params.id
+    );
 
     res.status(200).json({
-      message: "Product deleted successfully",
+      message: "Product deleted successfully.",
     });
   } catch (error) {
     res.status(500).json({
@@ -131,17 +279,16 @@ export const uploadImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
-        error: "No file uploaded",
+        message: "No image uploaded.",
       });
     }
 
     res.status(201).json({
-      message: "Image uploaded successfully",
+      message: "Image uploaded successfully.",
+
       imageUrl: `/uploads/${req.file.filename}`,
     });
   } catch (error) {
-    console.error(error);
-
     res.status(500).json({
       error: error.message,
     });
@@ -149,35 +296,40 @@ export const uploadImage = async (req, res) => {
 };
 
 //
-// UPDATE PRODUCT IMAGE
+// UPDATE PRODUCT MAIN IMAGE
 //
 export const updateImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
-        error: "No file uploaded",
+        message: "No image uploaded.",
       });
     }
 
-    const product = await ProductModel.findById(req.params.id);
+    const product = await ProductModel.findById(
+      req.params.id
+    );
 
     if (!product) {
       return res.status(404).json({
-        error: "Product not found",
+        message: "Product not found.",
       });
     }
 
-    if (product.image) {
-      const oldFileName = product.image.split("/").pop();
+    // Delete old image
 
-      const oldFilePath = path.join(
+    if (product.image) {
+      const oldName =
+        product.image.split("/").pop();
+
+      const oldPath = path.join(
         __dirname,
         "../uploads",
-        oldFileName
+        oldName
       );
 
-      if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
       }
     }
 
@@ -186,7 +338,8 @@ export const updateImage = async (req, res) => {
     await product.save();
 
     res.status(200).json({
-      message: "Image updated successfully",
+      message: "Image updated successfully.",
+
       product,
     });
   } catch (error) {
@@ -196,24 +349,29 @@ export const updateImage = async (req, res) => {
   }
 };
 
+
 //
-// GET ALL PRODUCT IMAGES
+// GET PRODUCT IMAGES
 //
 export const getImages = async (req, res) => {
   try {
-    const products = await ProductModel.find(
+    const images = await ProductModel.find(
       {},
       {
-        image: 1,
         title: 1,
+
+        image: 1,
+
+        images: 1,
       }
     ).sort({
       createdAt: -1,
     });
 
     res.status(200).json({
-      count: products.length,
-      images: products,
+      count: images.length,
+
+      images,
     });
   } catch (error) {
     res.status(500).json({
@@ -221,3 +379,123 @@ export const getImages = async (req, res) => {
     });
   }
 };
+
+
+
+//
+// GET FEATURED PRODUCTS
+//
+export const getFeaturedProducts = async (req, res) => {
+  try {
+    const products = await ProductModel.find({
+      isFeatured: true,
+      isActive: true,
+    })
+      .populate("category")
+      .sort({
+        createdAt: -1,
+      });
+
+    res.status(200).json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+//
+// GET LATEST PRODUCTS
+//
+export const getLatestProducts = async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 8;
+
+    const products = await ProductModel.find({
+      isActive: true,
+    })
+      .populate("category")
+      .sort({
+        createdAt: -1,
+      })
+      .limit(limit);
+
+    res.status(200).json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+
+//
+// GET TOP SELLING PRODUCTS
+//
+export const getTopSellingProducts = async (
+  req,
+  res
+) => {
+  try {
+    const limit = Number(req.query.limit) || 8;
+
+    const products = await ProductModel.find({
+      isActive: true,
+    })
+      .populate("category")
+      .sort({
+        sold: -1,
+      })
+      .limit(limit);
+
+    res.status(200).json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+
+
+//
+// GET LOW STOCK PRODUCTS
+//
+export const getLowStockProducts = async (
+  req,
+  res
+) => {
+  try {
+    const threshold =
+      Number(req.query.stock) || 5;
+
+    const products = await ProductModel.find({
+      stock: {
+        $lte: threshold,
+      },
+    })
+      .populate("category")
+      .sort({
+        stock: 1,
+      });
+
+    res.status(200).json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
