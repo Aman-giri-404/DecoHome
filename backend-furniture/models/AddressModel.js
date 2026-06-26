@@ -15,7 +15,7 @@ const addressSchema = new mongoose.Schema(
     },
 
     mobile: {
-      type: String,
+      type: Number,
       required: true,
     },
 
@@ -50,7 +50,7 @@ const addressSchema = new mongoose.Schema(
     },
 
     pincode: {
-      type: String,
+      type: Number,
       required: true,
     },
 

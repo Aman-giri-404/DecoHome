@@ -1,4 +1,6 @@
 import ProductModel from "../models/ProductModel.js";
+import CategoryModel from "../models/CategoryModel.js";
+import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -87,7 +89,18 @@ export const getProducts = async (req, res) => {
     let filter = {};
 
     if (category) {
-      filter.category = category;
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        filter.category = category;
+      } else {
+        const categoryDoc = await CategoryModel.findOne({
+          name: { $regex: new RegExp(`^${category}$`, "i") },
+        });
+        if (categoryDoc) {
+          filter.category = categoryDoc._id;
+        } else {
+          filter.category = new mongoose.Types.ObjectId();
+        }
+      }
     }
 
     if (brand) {

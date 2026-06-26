@@ -18,7 +18,7 @@ export default function Category() {
         setError("");
 
         const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin`
+          `${process.env.REACT_APP_API_URL}/admin?category=${category}`,
         );
 
         if (!res.ok) {
@@ -27,12 +27,7 @@ export default function Category() {
 
         const data = await res.json();
 
-        const filtered = (data.products || []).filter((item) => {
-          const itemCat = item.category && typeof item.category === "object" ? item.category.name : item.category;
-          return itemCat?.toLowerCase() === category?.toLowerCase();
-        });
-
-        setProducts(filtered);
+        setProducts(data.products || []);
       } catch (error) {
         console.error(error);
         setError("Failed to load products");
@@ -51,16 +46,11 @@ export default function Category() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-5 py-10">
-
         {/* Heading */}
         <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            {category}
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold">{category}</h1>
 
-          <p className="text-gray-500 mt-2">
-            Browse all {category} products
-          </p>
+          <p className="text-gray-500 mt-2">Browse all {category} products</p>
         </div>
 
         {/* Loading */}
@@ -78,80 +68,71 @@ export default function Category() {
         )}
 
         {/* No Products */}
-        {!loading &&
-          !error &&
-          products.length === 0 && (
-            <div className="bg-white shadow rounded-xl p-10 text-center">
-              <h2 className="text-2xl font-bold">
-                No Products Found
-              </h2>
+        {!loading && !error && products.length === 0 && (
+          <div className="bg-white shadow rounded-xl p-10 text-center">
+            <h2 className="text-2xl font-bold">No Products Found</h2>
 
-              <p className="text-gray-500 mt-2">
-                No products available in this category.
-              </p>
-            </div>
-          )}
+            <p className="text-gray-500 mt-2">
+              No products available in this category.
+            </p>
+          </div>
+        )}
 
         {/* Products */}
-        {!loading &&
-          !error &&
-          products.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {products.map((item) => (
-                <div
-                  key={item._id}
-                  onClick={() =>
-                    navigate(`/view/${item._id}`)
-                  }
-                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group"
-                >
-                  {/* Product Image */}
-                  <div className="overflow-hidden">
-                    <img
-                      src={`${process.env.REACT_APP_IMG_URL}${item.image}`}
-                      alt={item.title}
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/500x500?text=No+Image";
+        {!loading && !error && products.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {products.map((item) => (
+              <div
+                key={item._id}
+                onClick={() => navigate(`/view/${item._id}`)}
+                className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+              >
+                {/* Product Image */}
+                <div className="overflow-hidden">
+                  <img
+                    src={`${process.env.REACT_APP_IMG_URL}${item.image}`}
+                    alt={item.title}
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/500x500?text=No+Image";
+                    }}
+                    className="w-full h-72 object-cover group-hover:scale-105 transition duration-500"
+                  />
+                </div>
+
+                {/* Product Content */}
+                <div className="p-5">
+                  <p className="text-sm text-gray-500 uppercase">
+                    {item.category && typeof item.category === "object"
+                      ? item.category.name
+                      : item.category}
+                  </p>
+
+                  <h2 className="font-bold text-xl mt-2 line-clamp-1">
+                    {item.title}
+                  </h2>
+
+                  <p className="text-gray-600 text-sm mt-3 line-clamp-2">
+                    {item.description}
+                  </p>
+
+                  <div className="flex justify-between items-center mt-5">
+                    <span className="text-pink-600 text-2xl font-bold">
+                      ₹{item.price}
+                    </span>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/view/${item._id}`);
                       }}
-                      className="w-full h-72 object-cover group-hover:scale-105 transition duration-500"
-                    />
-                  </div>
-
-                  {/* Product Content */}
-                  <div className="p-5">
-                    <p className="text-sm text-gray-500 uppercase">
-                      {item.category && typeof item.category === "object" ? item.category.name : item.category}
-                    </p>
-
-                    <h2 className="font-bold text-xl mt-2 line-clamp-1">
-                      {item.title}
-                    </h2>
-
-                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">
-                      {item.description}
-                    </p>
-
-                    <div className="flex justify-between items-center mt-5">
-                      <span className="text-pink-600 text-2xl font-bold">
-                        ₹{item.price}
-                      </span>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/view/${item._id}`);
-                        }}
-                       
-                      >
-                        
-                      </button>
-                    </div>
+                    ></button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <Footer />

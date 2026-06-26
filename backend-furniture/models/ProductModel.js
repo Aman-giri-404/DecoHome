@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       unique: true,
       lowercase: true,
+      require: true,
       trim: true,
     },
 
@@ -23,14 +24,19 @@ const productSchema = new mongoose.Schema(
 
     // Pricing
     price: {
-      type: Number,
-      required: true,
-    },
+  type: Number,
+  required: true,
+  min: 0,
+},
+
+   
 
     originalPrice: {
-      type: Number,
-      default: 0,
-    },
+  type: Number,
+  required: false,
+  default: 0,
+  min: 0,
+},
 
     // Category & Brand
     category: {
@@ -57,15 +63,21 @@ const productSchema = new mongoose.Schema(
     ],
 
     // Inventory
+   
+
     stock: {
-      type: Number,
-      default: 0,
-    },
+  type: Number,
+  required: true,
+  min: 0,
+},
+
 
     sold: {
-      type: Number,
-      default: 0,
-    },
+  type: Number,
+  required: false,
+  default: 0,
+  min: 0,
+},
 
     sku: {
       type: String,
